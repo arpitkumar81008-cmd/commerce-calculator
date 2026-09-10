@@ -1,0 +1,1093 @@
+/* ---------- Design tokens ---------- */
+:root {
+  --paper: #f1ecdf;
+  --paper-card: #faf7ef;
+  --paper-bright: #fffdf8;
+  --ink: #1f2c38;
+  --ink-soft: #5b6672;
+  --line: #ded6c3;
+  --green: #2f6f5e;
+  --green-deep: #234f43;
+  --gold: #b8863b;
+  --error: #b23a2f;
+  --shadow-soft: 0 1px 2px rgba(31, 44, 38, 0.06);
+  --shadow-card: 0 4px 16px rgba(31, 44, 38, 0.08);
+
+  --font-display: 'Fraunces', 'Iowan Old Style', serif;
+  --font-body: 'IBM Plex Sans', system-ui, sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, monospace;
+}
+
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-body);
+}
+
+a {
+  color: inherit;
+}
+
+.page {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 2.5rem 1.5rem 5rem;
+}
+
+/* ---------- Masthead ---------- */
+.masthead {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1.5rem;
+  margin-bottom: 2.25rem;
+  padding-bottom: 1.25rem;
+  border-bottom: 1px solid var(--line);
+}
+
+.eyebrow {
+  margin: 0 0 0.2rem;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--gold);
+}
+
+.masthead h1 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 2.1rem;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+}
+
+.nav-link {
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--green);
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  white-space: nowrap;
+  padding-bottom: 0.15rem;
+}
+
+.nav-link:hover {
+  border-bottom-color: var(--green);
+}
+
+/* ---------- Entry form ---------- */
+.entry-card {
+  background: var(--paper-card);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 1.5rem 1.5rem 1.75rem;
+  box-shadow: var(--shadow-soft);
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+}
+
+.field-row {
+  display: flex;
+  gap: 1.25rem;
+}
+
+.field-row.two-up {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+
+.entry-card label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--ink-soft);
+  width: 100%;
+}
+
+.entry-card input {
+  font-family: var(--font-mono);
+  font-size: 1rem;
+  color: var(--ink);
+  padding: 0.5rem 0.1rem;
+  background: transparent;
+  border: none;
+  border-bottom: 1.5px solid var(--line);
+  border-radius: 0;
+  transition: border-color 0.15s ease;
+}
+
+.entry-card input::placeholder {
+  color: #b7ae98;
+  font-family: var(--font-body);
+}
+
+.entry-card input:focus {
+  outline: none;
+  border-bottom-color: var(--green);
+}
+
+.entry-card select {
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  color: var(--ink);
+  padding: 0.5rem 0.1rem;
+  background: transparent;
+  border: none;
+  border-bottom: 1.5px solid var(--line);
+  border-radius: 0;
+  transition: border-color 0.15s ease;
+  appearance: none;
+  background-image: linear-gradient(45deg, transparent 50%, var(--ink-soft) 50%),
+    linear-gradient(135deg, var(--ink-soft) 50%, transparent 50%);
+  background-position: calc(100% - 12px) center, calc(100% - 7px) center;
+  background-size: 5px 5px, 5px 5px;
+  background-repeat: no-repeat;
+  padding-right: 1.25rem;
+  cursor: pointer;
+}
+
+.entry-card select:focus {
+  outline: none;
+  border-bottom-color: var(--green);
+}
+
+.primary-button {
+  align-self: flex-start;
+  margin-top: 0.25rem;
+  padding: 0.65rem 1.4rem;
+  font-family: var(--font-body);
+  font-size: 0.88rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--paper-bright);
+  background: var(--green);
+  border: none;
+  border-radius: 7px;
+  cursor: pointer;
+  transition: background 0.15s ease, transform 0.1s ease;
+}
+
+.primary-button:hover:not(:disabled) {
+  background: var(--green-deep);
+}
+
+.primary-button:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+.primary-button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.error {
+  margin: 1rem 0 0;
+  padding: 0.7rem 1rem;
+  font-size: 0.88rem;
+  color: var(--error);
+  background: #fbeeec;
+  border-left: 3px solid var(--error);
+  border-radius: 4px;
+}
+
+.confirmation {
+  margin: 1rem 0 0;
+  padding: 0.7rem 1rem;
+  font-size: 0.88rem;
+  color: var(--green-deep);
+  background: #ecf4f1;
+  border-left: 3px solid var(--green);
+  border-radius: 4px;
+}
+
+/* ---------- Ledger table ---------- */
+.ledger {
+  margin-top: 2.5rem;
+}
+
+.ledger-heading {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 0.85rem;
+}
+
+.ledger-heading h2 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 1.3rem;
+  font-weight: 600;
+}
+
+.ledger-count {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  color: var(--ink-soft);
+}
+
+.empty-state {
+  padding: 1.75rem 1rem;
+  text-align: center;
+  font-size: 0.92rem;
+  color: var(--ink-soft);
+  font-style: italic;
+  background: var(--paper-card);
+  border: 1px dashed var(--line);
+  border-radius: 10px;
+}
+
+.table-wrap {
+  overflow-x: auto;
+  background: var(--paper-card);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+thead th {
+  text-align: right;
+  padding: 0.65rem 0.9rem;
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  border-bottom: 1px solid var(--line);
+}
+
+thead th:first-child {
+  text-align: left;
+}
+
+tbody td {
+  padding: 0.7rem 0.9rem;
+  font-size: 0.92rem;
+  border-bottom: 1px solid #ece5d3;
+}
+
+tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.cell-name {
+  font-family: var(--font-body);
+  font-weight: 500;
+}
+
+.cell-num {
+  font-family: var(--font-mono);
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.cell-total {
+  color: var(--gold);
+  font-weight: 600;
+}
+
+.increment-button {
+  padding: 0.25rem 0.55rem;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--ink-soft);
+  background: transparent;
+  border: 1px solid var(--line);
+  border-radius: 5px;
+  cursor: pointer;
+  transition: color 0.15s ease, border-color 0.15s ease;
+}
+
+.increment-button:hover:not(:disabled) {
+  color: var(--green-deep);
+  border-color: var(--green);
+}
+
+.increment-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.view-bill-button {
+  display: inline-block;
+  margin-top: 1.5rem;
+  padding: 0.7rem 1.4rem;
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--paper-bright);
+  background: var(--ink);
+  text-decoration: none;
+  border-radius: 7px;
+  transition: background 0.15s ease;
+}
+
+.view-bill-button:hover {
+  background: var(--green-deep);
+}
+
+/* ---------- Bill page ---------- */
+.bill-page {
+  max-width: 100%;
+  padding-top: 1.75rem;
+}
+
+.bill-page-nav {
+  max-width: 480px;
+  margin: 0 auto 1.5rem;
+}
+
+.receipt-frame {
+  display: flex;
+  justify-content: center;
+  padding-bottom: 2rem;
+}
+
+.receipt {
+  position: relative;
+  width: min(420px, 100%);
+  background: var(--paper-bright);
+  clip-path: polygon(
+    0% 0px, 4% 8px, 8% 0px, 12% 8px, 16% 0px, 20% 8px, 24% 0px, 28% 8px, 32% 0px, 36% 8px,
+    40% 0px, 44% 8px, 48% 0px, 52% 8px, 56% 0px, 60% 8px, 64% 0px, 68% 8px, 72% 0px, 76% 8px,
+    80% 0px, 84% 8px, 88% 0px, 92% 8px, 96% 0px, 100% 8px,
+    100% 100%, 96% calc(100% - 8px), 92% 100%, 88% calc(100% - 8px), 84% 100%,
+    80% calc(100% - 8px), 76% 100%, 72% calc(100% - 8px), 68% 100%, 64% calc(100% - 8px), 60% 100%,
+    56% calc(100% - 8px), 52% 100%, 48% calc(100% - 8px), 44% 100%, 40% calc(100% - 8px), 36% 100%,
+    32% calc(100% - 8px), 28% 100%, 24% calc(100% - 8px), 20% 100%, 16% calc(100% - 8px), 12% 100%,
+    8% calc(100% - 8px), 4% 100%, 0% calc(100% - 8px)
+  );
+  filter: drop-shadow(0 18px 26px rgba(31, 44, 38, 0.16)) drop-shadow(0 2px 6px rgba(31, 44, 38, 0.08));
+}
+
+.receipt-body {
+  padding: 2.5rem 2rem 2.25rem;
+}
+
+.receipt-eyebrow {
+  margin: 0;
+  text-align: center;
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+
+.receipt-title {
+  margin: 0.35rem 0 0.15rem;
+  text-align: center;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-style: italic;
+  font-size: 1.7rem;
+  color: var(--ink);
+}
+
+.receipt-meta {
+  margin: 0;
+  text-align: center;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--ink-soft);
+}
+
+.receipt-divider {
+  margin: 1.35rem 0;
+  border-top: 1px dashed var(--line);
+}
+
+.receipt-lines {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+}
+
+.receipt-line-main {
+  display: flex;
+  align-items: baseline;
+  gap: 0.4rem;
+}
+
+.receipt-line-name {
+  font-family: var(--font-body);
+  font-weight: 500;
+  font-size: 0.94rem;
+  white-space: nowrap;
+}
+
+.receipt-line-dots {
+  flex: 1;
+  border-bottom: 1px dotted #c9c0a9;
+  height: 0.6em;
+  margin: 0 0.25rem;
+}
+
+.receipt-line-amount {
+  font-family: var(--font-mono);
+  font-size: 0.94rem;
+  font-weight: 600;
+  color: var(--ink);
+  white-space: nowrap;
+}
+
+.receipt-line-sub {
+  margin-top: 0.15rem;
+  font-family: var(--font-mono);
+  font-size: 0.74rem;
+  color: var(--ink-soft);
+}
+
+.receipt-summary {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.receipt-summary-row {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+  color: var(--ink-soft);
+}
+
+.receipt-grand-total {
+  margin-top: 0.4rem;
+  padding-top: 0.6rem;
+  border-top: 1px solid var(--line);
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.receipt-item-count {
+  margin: 0.6rem 0 0;
+  text-align: center;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--ink-soft);
+}
+
+.receipt-stamp {
+  position: absolute;
+  top: 2.4rem;
+  right: 1.6rem;
+  padding: 0.3rem 0.7rem;
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--green);
+  border: 1.5px solid var(--green);
+  border-radius: 4px;
+  transform: rotate(8deg);
+  opacity: 0.75;
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 560px) {
+  .masthead {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .field-row.two-up {
+    grid-template-columns: 1fr;
+  }
+
+  thead th:nth-child(3) {
+    display: none;
+  }
+  tbody td:nth-child(3) {
+    display: none;
+  }
+}
+
+/* ---------- Accessibility ---------- */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible {
+  outline: 2px solid var(--green);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition: none !important;
+  }
+}
+
+/* ---------- Masthead extras (customer chip, multi-action group) ---------- */
+.masthead-actions {
+  display: flex;
+  align-items: center;
+  gap: 1.1rem;
+}
+
+.customer-chip {
+  margin: 0.3rem 0 0;
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  color: var(--ink-soft);
+}
+
+.customer-id {
+  color: var(--green-deep);
+  font-weight: 600;
+}
+
+.text-button {
+  padding: 0;
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--ink-soft);
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.text-button:hover {
+  color: var(--error);
+}
+
+/* ---------- Identity gate ---------- */
+.identity-page {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 1.5rem;
+}
+
+.identity-card {
+  width: min(420px, 100%);
+  background: var(--paper-card);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 2.25rem 2rem;
+  box-shadow: var(--shadow-card);
+  text-align: center;
+}
+
+.identity-title {
+  margin: 0.3rem 0 1rem;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 1.9rem;
+  color: var(--ink);
+}
+
+.identity-copy {
+  margin: 0 0 1.5rem;
+  font-size: 0.92rem;
+  color: var(--ink-soft);
+  line-height: 1.5;
+}
+
+.identity-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.identity-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  text-align: left;
+}
+
+.identity-form label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--ink-soft);
+}
+
+.identity-form input {
+  font-family: var(--font-mono);
+  font-size: 1.05rem;
+  color: var(--ink);
+  padding: 0.55rem 0.1rem;
+  background: transparent;
+  border: none;
+  border-bottom: 1.5px solid var(--line);
+  text-align: center;
+  transition: border-color 0.15s ease;
+}
+
+.identity-form input:focus {
+  outline: none;
+  border-bottom-color: var(--green);
+}
+
+.secondary-button {
+  padding: 0.65rem 1.4rem;
+  font-family: var(--font-body);
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--green-deep);
+  background: transparent;
+  border: 1.5px solid var(--green);
+  border-radius: 7px;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.secondary-button:hover {
+  background: #ecf4f1;
+}
+
+.identity-generated {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.generated-id {
+  padding: 0.9rem 1.2rem;
+  font-family: var(--font-mono);
+  font-size: 1.4rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--gold);
+  background: #fbf3e6;
+  border: 1.5px dashed var(--gold);
+  border-radius: 10px;
+}
+
+/* ---------- Ledger form: three-column row, quantity editor, remove ---------- */
+.field-row.three-up {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1.4fr;
+}
+
+.qty-editor {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.qty-input {
+  width: 4.5rem;
+  font-family: var(--font-mono);
+  font-size: 0.88rem;
+  color: var(--ink);
+  padding: 0.3rem 0.4rem;
+  background: transparent;
+  border: 1px solid var(--line);
+  border-radius: 5px;
+}
+
+.qty-input:focus {
+  outline: none;
+  border-color: var(--green);
+}
+
+.remove-button {
+  padding: 0.3rem 0.6rem;
+  font-family: var(--font-body);
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--error);
+  background: transparent;
+  border: 1px solid #e3b3ac;
+  border-radius: 5px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.remove-button:hover:not(:disabled) {
+  background: #fbeeec;
+}
+
+.remove-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ---------- Current bill totals (integrated into the table footer, so
+   they share the exact same look as the line items above them) ---------- */
+tfoot td {
+  padding: 0.55rem 0.9rem;
+  border-bottom: none;
+  border-top: 1px dashed var(--line);
+}
+
+tfoot tr:first-child td {
+  border-top: 1px solid var(--line);
+}
+
+.foot-label {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  color: var(--ink-soft);
+  text-align: right;
+}
+
+.foot-total-row td {
+  border-top: 1.5px solid var(--line);
+  padding-top: 0.75rem;
+}
+
+.foot-total-label {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.foot-total-value {
+  font-size: 1.05rem;
+}
+
+/* ---------- Balance banner ---------- */
+.balance-banner {
+  margin-top: 1.25rem;
+  padding: 0.85rem 1.25rem;
+  border-radius: 10px;
+  font-size: 0.92rem;
+  border: 1px solid var(--line);
+}
+
+.balance-due {
+  background: #fbeeec;
+  border-color: #e3b3ac;
+  color: var(--error);
+}
+
+.balance-credit {
+  background: #f8ecd6;
+  border-color: #e6cd9c;
+  color: var(--gold);
+}
+
+.balance-clear {
+  background: #e3f0ea;
+  border-color: #bcdccc;
+  color: var(--green-deep);
+}
+
+.balance-banner strong {
+  font-family: var(--font-mono);
+}
+
+/* ---------- Standalone "pay off your due" card ---------- */
+.pay-due-card {
+  margin-top: 1.25rem;
+}
+
+.pay-due-title {
+  margin: 0 0 0.25rem;
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.edited-tag {
+  color: var(--gold);
+  font-style: italic;
+}
+
+/* ---------- Settle card ---------- */
+.settle-card {
+  margin-top: 1.25rem;
+  padding: 1.25rem 1.5rem;
+  background: var(--paper-card);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  align-items: flex-start;
+}
+
+.settle-card label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--ink-soft);
+  width: 100%;
+  max-width: 260px;
+}
+
+.settle-card input {
+  font-family: var(--font-mono);
+  font-size: 1rem;
+  color: var(--ink);
+  padding: 0.5rem 0.1rem;
+  background: transparent;
+  border: none;
+  border-bottom: 1.5px solid var(--line);
+}
+
+.settle-card input:focus {
+  outline: none;
+  border-bottom-color: var(--green);
+}
+
+.due-preview {
+  margin: 0;
+  font-size: 0.88rem;
+  color: var(--ink-soft);
+}
+
+.due-preview strong {
+  color: var(--gold);
+}
+
+.settle-hint {
+  margin: 0;
+  font-size: 0.78rem;
+  color: var(--ink-soft);
+  font-style: italic;
+}
+
+/* ---------- Transaction history ---------- */
+.transaction-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.transaction-card {
+  padding: 1.1rem 1.3rem;
+  background: var(--paper-card);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+}
+
+.transaction-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: 0.75rem;
+}
+
+.transaction-date {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  color: var(--ink-soft);
+}
+
+.transaction-items-summary {
+  margin: 0.2rem 0 0;
+  font-size: 0.88rem;
+  color: var(--ink);
+  max-width: 34ch;
+}
+
+.status-badge {
+  flex-shrink: 0;
+  padding: 0.25rem 0.65rem;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+.status-paid {
+  color: var(--green-deep);
+  background: #e3f0ea;
+}
+
+.status-partial {
+  color: var(--gold);
+  background: #f8ecd6;
+}
+
+.status-due {
+  color: var(--error);
+  background: #fbeeec;
+}
+
+.transaction-amounts {
+  display: flex;
+  gap: 1.75rem;
+  padding-top: 0.6rem;
+  border-top: 1px dashed var(--line);
+}
+
+.amount-label {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+
+.amount-value {
+  display: block;
+  margin-top: 0.15rem;
+  font-family: var(--font-mono);
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.amount-due {
+  color: var(--error);
+}
+
+/* ---------- Responsive additions ---------- */
+@media (max-width: 560px) {
+  .field-row.three-up {
+    grid-template-columns: 1fr;
+  }
+
+  .masthead-actions {
+    flex-wrap: wrap;
+  }
+
+  .transaction-amounts {
+    gap: 1.1rem;
+    flex-wrap: wrap;
+  }
+}
+
+/* ---------- Admin dashboard ---------- */
+.admin-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 0.9rem;
+  margin: 1.5rem 0 2.5rem;
+}
+
+.admin-stat-card {
+  padding: 1rem 1.1rem;
+  background: var(--paper-card);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.admin-stat-value {
+  font-family: var(--font-mono);
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.admin-stat-due {
+  color: var(--error);
+}
+
+.admin-stat-credit {
+  color: var(--gold);
+}
+
+.admin-search-form {
+  display: flex;
+  gap: 0.75rem;
+  margin-bottom: 1.25rem;
+}
+
+.admin-search-form input {
+  flex: 1;
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  padding: 0.55rem 0.8rem;
+  background: var(--paper-card);
+  border: 1px solid var(--line);
+  border-radius: 7px;
+}
+
+.admin-search-form input:focus {
+  outline: none;
+  border-color: var(--green);
+}
+
+.customer-id-cell {
+  font-weight: 600;
+  color: var(--green-deep);
+}
+
+.admin-customer-detail {
+  margin-top: 1.5rem;
+  padding: 1.1rem 1.3rem;
+  background: var(--paper-card);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+}
+
+.admin-customer-detail > .transaction-card-header {
+  margin-bottom: 1rem;
+}
+
+.admin-edit-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+  gap: 0.85rem;
+  padding-top: 0.75rem;
+  border-top: 1px dashed var(--line);
+  margin-top: 0.5rem;
+}
+
+.admin-edit-grid label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--ink-soft);
+}
+
+.admin-edit-grid input {
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+  padding: 0.4rem 0.5rem;
+  border: 1px solid var(--line);
+  border-radius: 5px;
+  background: var(--paper-bright);
+}
+
+.admin-edit-grid input:focus {
+  outline: none;
+  border-color: var(--green);
+}
+
+.admin-edit-note {
+  grid-column: 1 / -1;
+}
+
+.admin-edit-actions {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  margin-top: 0.85rem;
+}
