@@ -1,178 +1,162 @@
 # Commerce Calculator
 
-A full-stack billing app: an Express + TypeScript backend backed by a real
-persistent data store, and a React + TypeScript (Vite) frontend. Every
-customer gets their own consumer ID, their own cart/ledger, and a permanent
-history of past transactions with running due/credit tracking. There's also
-a password-protected admin dashboard for you to operate the shop.
+[![Live Demo](https://img.shields.io/badge/Live_Demo-Cloudflare_Pages-F38020?style=for-the-badge&logo=cloudflare&logoColor=white)](https://23cac5e3.commerce-calculator-9yf.pages.dev)
+[![React](https://img.shields.io/badge/React_19-TypeScript-61DAFB?style=for-the-badge&logo=react&logoColor=black)](https://react.dev/)
+[![Node.js](https://img.shields.io/badge/Express-TypeScript-339933?style=for-the-badge&logo=node.js&logoColor=white)](https://expressjs.com/)
+[![Architecture Doc](https://img.shields.io/badge/Technical_Evaluation-Documented-blue?style=for-the-badge)](./ARCHITECTURE_AND_EVALUATION.md)
 
-## Project structure
+> 🔗 **Live Hosted Website:** [https://23cac5e3.commerce-calculator-9yf.pages.dev](https://23cac5e3.commerce-calculator-9yf.pages.dev)  
+> 📖 **Deep-Dive Architecture & Evaluation Report:** [ARCHITECTURE_AND_EVALUATION.md](./ARCHITECTURE_AND_EVALUATION.md)
 
+---
+
+## 📌 Executive Overview for Interviewers & Evaluators
+
+**Commerce Calculator** is an end-to-end retail point-of-sale (POS) and continuous financial ledger application built with **React 19**, **TypeScript**, **Node.js/Express**, and deployed on **Cloudflare Pages**.
+
+### The Core Problem Solved
+Traditional retail billing and POS software treat customer purchases as **disconnected, stateless receipts**. When a customer underpays (accumulates due) or overpays (accrues credit), traditional systems struggle to track these running obligations across repeat visits without cumbersome manual bookkeeping.
+
+Commerce Calculator solves this by modeling every customer relationship as a **continuous, stateful credit-and-debt ledger**:
+- Prior debts or surplus credits **automatically roll into future checkouts**.
+- Customers can settle standalone dues without buying new items.
+- Full auditability is maintained with immutable transaction logs and an **automated chronological ledger replay engine**.
+
+---
+
+## 🚀 Key Engineering & Architectural Highlights
+
+### 1. Zero-Friction Consumer Identity (Loyalty-Card Model)
+- No friction or forgotten passwords: users are assigned a deterministic, human-readable ID formatted as `CUST-[A-Z2-9]{6}` (e.g. `CUST-7F3K9Q`).
+- Visual confusion is prevented by strictly excluding ambiguous characters (`0`, `O`, `1`, `I`).
+- Sessions persist via browser `localStorage` with instant case-insensitive lookups.
+
+### 2. Intelligent Cart & Indian GST Engine
+- **Item Consolidation:** Scanned/entered items with identical names automatically merge quantities rather than cluttering the bill with duplicate rows.
+- **GST Slabs:** Native support for Indian statutory GST brackets (`0%`, `0.25%`, `3%`, `5%`, `12%`, `18%`, `28%`) alongside custom fractional tax rates.
+- **Financial Precision:** Strict 2-decimal-place rounding (`round2`) on subtotal, tax, and gross totals prevents floating-point accumulator drift.
+
+### 3. Bidirectional Balance Rollover & Standalone Due Settlement
+- **Overpayment Credit:** Paying more than the current bill instantly settles any historic debt and parks the remainder as store credit (`credit > 0`), which automatically offsets future visits.
+- **Underpayment Debt:** Shortfalls carry forward as outstanding due (`due > 0`).
+- **Debt-Only Settlement:** Customers returning purely to clear debts can make standalone payments via `/api/customers/:id/payments` without requiring an active cart.
+
+### 4. Admin Management & Chronological Ledger Replay Engine
+- Password-protected administrative interface (`/admin`) displaying store-wide aggregated analytics (Total Billed, Total Collected, Market Due, Customer Credit).
+- **Audit Consistency:** If an admin corrects a typo in a historic transaction or removes a faulty record, the **Chronological Ledger Replay Algorithm** (`recomputeCustomerBalances`) replays that customer's entire transaction history forward in time, recalculating all downstream balances and payment statuses.
+
+### 5. Crash-Resilient Zero-Compile Persistence
+- Avoids native C++ compilation dependencies (such as `better-sqlite3` or `node-gyp`), ensuring zero-failure installation across any operating system or container.
+- Uses an atomic `.tmp` file-swap pattern on standard Node.js `fs` to prevent database corruption during sudden process restarts.
+
+---
+
+## 🏛️ System Architecture
+
+```mermaid
+flowchart TD
+    subgraph Client ["Frontend (React 19 + TypeScript + Vite)"]
+        UI_Gate["Identity Gate (/)\n[CUST-ID Generator & Lookup]"]
+        UI_Ledger["Ledger Page (/ledger)\n[Cart Management & GST Slabs]"]
+        UI_Bill["Bill Page (/bill)\n[Live Balance & Payment Preview]"]
+        UI_Admin["Admin Suite (/admin)\n[Store Analytics & Audit Replay]"]
+    end
+
+    subgraph Hosting ["Edge Deployment"]
+        CF_Pages["Cloudflare Pages\n(https://23cac5e3.commerce-calculator-9yf.pages.dev)"]
+    end
+
+    subgraph Backend ["Backend Service (Express + TypeScript)"]
+        API_Router["REST API Router (/api)"]
+        Auth_MW["Admin Auth & Customer Middleware"]
+        Ledger_Engine["Ledger & Balance Engine"]
+        Replay_Engine["Chronological Balance Replay Engine"]
+    end
+
+    subgraph Storage ["Atomic Persistence Layer"]
+        JSON_Store[("Atomic JSON Store\n(backend/data.json)")]
+    end
+
+    Hosting --> Client
+    Client -- "REST API Requests" --> API_Router
+    API_Router --> Auth_MW
+    Auth_MW --> Ledger_Engine
+    Auth_MW --> Replay_Engine
+    Ledger_Engine --> JSON_Store
+    Replay_Engine --> JSON_Store
 ```
-commerce-calculator/
-├── backend/     Express API + JSON data store (TypeScript)
-└── frontend/    React app (Vite + TypeScript)
-```
 
-## How it works
+---
 
-- **Consumer IDs.** On first visit, you either enter an existing ID or
-  generate a new one (just give a name). IDs look like `CUST-7F3K9Q`. There's
-  no password on the customer side — the ID itself is the credential,
-  similar to a loyalty-card number.
-- **Ledger** — add articles (name, amount, GST slab, quantity) to the current
-  cart. The same article name merges quantities instead of duplicating rows.
-  Each row has a quantity editor (type any number, including large restocks)
-  plus a quick "+1" button, and a "Remove" button.
-- **Bill page** — shows the current cart itemized (subtotal/tax/total are
-  now part of the same table as the line items, not a separately-styled
-  block), plus your current balance banner at the top. Settling a bill
-  automatically rolls in any existing due or credit: pay more than this
-  bill's total and the extra clears old dues first, then becomes credit
-  applied to your *next* bill; pay less and the shortfall carries forward
-  as due. If you already owe money, a standalone "Pay off your due" box lets
-  you record a payment at any time — no need to buy anything first.
-- **Transaction history** — every settlement and every standalone payment is
-  kept forever, each showing the balance immediately after it. Recording a
-  payment always *adds* to what's been paid — it can never overwrite or
-  erase an earlier payment (this was a real bug in an earlier version, now
-  fixed by making every payment its own transaction rather than an edit of
-  an old one).
-- **Admin dashboard** (`/admin`, password `admin123` by default) — stats
-  (total customers, transactions, amount billed/collected, outstanding
-  due/credit across everyone), a searchable customer directory so you can
-  look up a lost ID by name, drill-down into any customer's full history,
-  and the ability to correct or delete a faulty transaction. Editing or
-  deleting a transaction automatically recalculates that customer's balance
-  and every later transaction of theirs, so the ledger stays consistent.
-- **Data store.** All of this lives in `backend/data.json`, a plain JSON
-  file created automatically on first run and rewritten after every change,
-  so nothing is lost between restarts. It's deliberately a zero-dependency,
-  pure-JavaScript store (no native modules to compile) so `npm install`
-  can't fail on someone's machine due to a missing C++ build toolchain.
+## 🛠️ Tech Stack & Tooling
 
-## Running it
+| Component | Technologies |
+| :--- | :--- |
+| **Frontend** | React 19, TypeScript, Vite, React Router v7, Modern Semantic CSS |
+| **Backend** | Node.js, Express, TypeScript, CORS, `ts-node-dev` |
+| **Persistence** | Zero-dependency atomic file-backed JSON store |
+| **Deployment** | Cloudflare Pages (Frontend SPA), Cloudflare Tunnel / Reverse Proxy compatible |
+| **Code Quality** | Oxlint, TypeScript strict mode |
 
-You need two terminals — one for the backend, one for the frontend.
+---
 
-### 1. Backend (http://localhost:3001)
+## 📡 REST API Reference
 
-```sh
+### Customer Endpoints
+- `POST /api/customers` — Register a customer and generate unique Consumer ID
+- `GET /api/customers/:id` — Fetch customer details and current running balance
+- `GET /api/customers/:id/cart` — List active unsettled cart articles
+- `POST /api/customers/:id/cart` — Add article or merge quantity (`{ name, amount, taxRate?, quantity? }`)
+- `PATCH /api/customers/:id/cart/:itemId` — Set exact item quantity (up to 1,000,000)
+- `DELETE /api/customers/:id/cart/:itemId` — Remove item from active cart
+- `GET /api/customers/:id/bill` — Preview subtotal, taxes, balance obligations, and net total
+- `POST /api/customers/:id/settle` — Finalize cart into a transaction, apply dues/credits, and clear cart
+- `POST /api/customers/:id/payments` — Record a standalone payment towards existing due balance
+- `GET /api/customers/:id/transactions` — Full chronological transaction history for customer
+
+### Administrative Endpoints (`x-admin-password: <password>` header required)
+- `POST /api/admin/login` — Authenticate admin session
+- `GET /api/admin/stats` — Store-wide totals (Revenue, Collected, Outstanding Due, Outstanding Credit)
+- `GET /api/admin/customers?q=` — Search/list customer directory by name or ID
+- `GET /api/admin/transactions` — System-wide transaction audit log
+- `PATCH /api/admin/transactions/:txId` — Correct a past transaction and trigger balance replay cascade
+- `DELETE /api/admin/transactions/:txId` — Remove a faulty transaction and recalculate customer balance forward
+
+---
+
+## 💻 Local Development Setup
+
+### Prerequisites
+- Node.js (v18 or newer recommended)
+- npm
+
+### 1. Backend Setup
+```bash
 cd backend
 npm install
 npm run dev
 ```
+*Backend runs on `http://localhost:3001`.*  
+*Default Admin Password:* `admin123` (configure via `ADMIN_PASSWORD=yourpassword npm run dev`).
 
-`backend/data.json` is created automatically on first run and excluded from
-version control — back it up yourself if it matters to you.
-
-**Admin password:** defaults to `admin123`. To change it, set the
-`ADMIN_PASSWORD` environment variable before starting the backend, e.g.
-`ADMIN_PASSWORD=something-else npm run dev`.
-
-API (all under `/api`):
-- `POST /api/customers` — body `{ name }`, creates a customer, returns a generated ID
-- `GET /api/customers/:id` — look up a customer (case-insensitive); includes their current `balance`
-- `GET /api/customers/:id/cart` — current (unsettled) line items
-- `GET /api/customers/:id/bill` — current cart totals plus balance: `{ subtotal, tax, total, itemCount, lineCount, balance, due, credit }`
-- `GET /api/customers/:id/balance` — just the balance: `{ balance, due, credit }`
-- `POST /api/customers/:id/cart` — body `{ name, amount, taxRate?, quantity? }`; merges into an existing line if the name matches
-- `PATCH /api/customers/:id/cart/:itemId` — body `{ quantity }`, sets the exact quantity (up to 1,000,000)
-- `DELETE /api/customers/:id/cart/:itemId` — removes a line item
-- `POST /api/customers/:id/settle` — body `{ paid }`; finalizes the cart into a transaction, rolling in any existing balance, then clears the cart
-- `POST /api/customers/:id/payments` — body `{ amount }`; records a standalone payment against the balance (always additive)
-- `GET /api/customers/:id/transactions` — full history, newest first
-
-Admin API (all require header `x-admin-password: <password>`):
-- `POST /api/admin/login` — body `{ password }`; just for immediate login feedback
-- `GET /api/admin/stats` — shop-wide totals
-- `GET /api/admin/customers?q=` — list/search customers by name or ID
-- `GET /api/admin/customers/:id/transactions` — a specific customer's full history
-- `GET /api/admin/transactions` — every transaction across every customer
-- `PATCH /api/admin/transactions/:txId` — body `{ subtotal?, tax?, total?, paid?, note? }`; corrects a transaction and recalculates that customer's balance forward from that point
-- `DELETE /api/admin/transactions/:txId` — deletes a transaction and recalculates the customer's balance
-
-### 2. Frontend (http://localhost:5173)
-
-```sh
+### 2. Frontend Setup
+```bash
 cd frontend
 npm install
 npm run dev
 ```
+*Frontend runs on `http://localhost:5173`.*
 
-Open http://localhost:5173. You'll land on the identity gate first; the
-ledger and bill pages require a valid consumer ID (remembered in your
-browser via `localStorage` until you hit "Switch ID"). The admin dashboard
-lives at a separate, unlinked route — `/admin` — and isn't shown anywhere in
-the customer-facing UI; only people who know that URL and the password can
-reach it.
-
-All amounts are shown in ₹ (INR).
-
-## Accessing it from your phone (same Wi-Fi)
-
-The frontend proxies API calls internally, so only **one port** (`5173`)
-needs to be reachable.
-
-1. Make sure your phone is on the same Wi-Fi network as your computer.
-2. Find your computer's local IP address:
-   - **Windows**: `ipconfig` in Command Prompt → "IPv4 Address"
-   - **Mac**: `ipconfig getifaddr en0` in Terminal
-   - **Linux**: `hostname -I`
-3. Start both servers as usual.
-4. On your phone's browser, go to `http://<your-computer's-IP>:5173`.
-
-## Sharing it with anyone, anywhere (temporary public link)
-
-This uses a **tunnel** — a free service that gives your locally-running app
-a public URL. The link only works while your computer is on and both
-servers are running.
-
-**Using Cloudflare Tunnel (no account needed):**
-
-1. Install `cloudflared`:
-   - **Mac**: `brew install cloudflared`
-   - **Windows/Linux**: see [developers.cloudflare.com/cloudflare-one/connections/connect-networks/downloads](https://developers.cloudflare.com/cloudflare-one/connections/connect-networks/downloads)
-2. Start both servers as usual.
-3. In a third terminal: `cloudflared tunnel --url http://localhost:5173`
-4. Share the `https://random-words-1234.trycloudflare.com` URL it prints.
-
-**Alternative: single-server mode** — build the frontend into the backend
-and serve everything from one port instead of running two dev servers:
-```sh
+### Single-Port Production Mode (Optional)
+To bundle the frontend into the backend and serve everything from a single port:
+```bash
 cd backend
-npm run build:all   # builds the backend, builds the frontend, copies it into backend/public
+npm run build:all
 npm start
 ```
-Then tunnel `http://localhost:3001` instead of 5173.
 
-**Worth knowing about tunneling:** anyone with the link can create customer
-IDs and use the app. The `/admin` route is still password-protected, but the
-password travels as a request header — fine over the HTTPS tunnel, but
-don't reuse a password you care about elsewhere. Data is real and permanent
-(the JSON file), so it'll still be there next time even after you stop the
-tunnel; just the *public link* stops working until you start a new tunnel.
+---
 
-**If you want it reachable even when your computer is off:** that requires
-actually deploying the backend and frontend to a cloud host rather than
-tunneling from your machine — a different, bigger step. Happy to set that up
-whenever you want to go that route.
-
-## Notes on the data model
-
-- A customer's **cart** is their current, unsettled, in-progress order.
-- Every customer has a running **balance**: positive means they owe the
-  shop (due), negative means the shop owes them (credit), zero means
-  settled. This is the single source of truth for "how much is
-  outstanding" — individual transactions record what the balance was
-  immediately before and after them, for a full audit trail, but the
-  customer's current `balance` field is what everything else derives from.
-- **Settling** a cart or **recording a payment** each create a new
-  transaction that adjusts the balance — nothing is ever overwritten in
-  place, which is what makes payment history reliable.
-- Admin **corrections** (editing or deleting a transaction) are the one
-  exception: they replay that customer's entire transaction history in
-  order afterward, recalculating every balance from that point forward, so
-  a fix to an old mistake correctly ripples through to today's balance.
-- Consumer IDs use an unambiguous character set (no `0`/`O`/`1`/`I`) so
-  they're easy to read back over the phone, and lookups are case-insensitive.
+## 📄 Documentation Links
+- **Live Hosted Application:** [https://23cac5e3.commerce-calculator-9yf.pages.dev](https://23cac5e3.commerce-calculator-9yf.pages.dev)
+- **Detailed System Architecture & Evaluation Report:** [ARCHITECTURE_AND_EVALUATION.md](./ARCHITECTURE_AND_EVALUATION.md)
